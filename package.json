@@ -1,0 +1,19 @@
+{
+  "name": "tesa-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NightRobot/tesa-api.git"
+  },
+  "author": "Aruk Pupatee and Natthawut Sibunan at KMUTNB",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/NightRobot/tesa-api/issues"
+  },
+  "homepage": "https://github.com/NightRobot/tesa-api#readme"
+}

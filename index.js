@@ -4,19 +4,10 @@ var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 
 mongoose.Promise = global.Promise;
-mongoose.connect('mongodb://localhost/TESA');
 
-var tesa = require('./models/tesa');
-/*
-var Pressure = mongoose.model('pressure');
-var Temperature = mongoose.model('temperature');
-var Humidity = mongoose.model('humidity');
-var Gyroscope = mongoose.model('gyroscope');
-var Accelerometer = mongoose.model('accelerometer');
-var Magnetometer = mongoose.model('magnetometer');
-var Leds = mongoose.model('leds');
-var Din = mongoose.model('din');
-*/
+var schema = require('./models/schema');
+var mockup_schema = require('./models/mockup_schema');
+var db = require('./models/db');
 
 app.set('port',5000);
 app.use(express.static(__dirname + '/public'));
@@ -26,6 +17,9 @@ app.set('view engine', 'ejs');
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+var apiRoutes = express.Router();
+var mockupRoutes = express.Router();
 
 const status = {
     "00": {
@@ -42,19 +36,17 @@ const status = {
     }
 };
 
-app.get('/pressure/:teamID/:N', function(req, res){
+apiRoutes.get('/:table/:teamID/:N', function(req, res){
+    var table = req.params.table;
     var teamID = req.params.teamID;
     var N = req.params.N;
-    var query = mongoose.model('pressure').find({teamID:teamID});
+    var query = db.model(table).find({teamID:teamID});
     if(N != 'all'){
         query = query.limit(parseInt(N));
     }
     query.exec(function(err, data){
         if(err) {
-            res.json({
-                statusCode: status["02"].code,
-                statusDesc: status["02"].desc
-            });
+            res.send(err);
         } else if(data.length == 0){
             res.json({
                 statusCode: status["01"].code,
@@ -70,195 +62,22 @@ app.get('/pressure/:teamID/:N', function(req, res){
     });
 });
 
-app.get('/temperature/:teamID/:N', function(req, res){
+mockupRoutes.get('/:table/:teamID/:N', function(req, res){
+    var table = 'mockup_'+req.params.table;
     var teamID = req.params.teamID;
     var N = req.params.N;
-    var query = mongoose.model('temperature').find({teamID:teamID});
-    if(N != 'all'){
-        query = query.limit(parseInt(N));
-    }
-    query.exec(function(err, data){
-        if(err) {
-            res.json({
-                statusCode: status["02"].code,
-                statusDesc: status["02"].desc
-            });
-        } else if(data.length == 0){
-            res.json({
-                statusCode: status["01"].code,
-                statusDesc: status["01"].desc
-            });
-        } else {
-            res.json({
-                statusCode: status["00"].code,
-                statusDesc: status["00"].desc,
-                data: data
-            });
-        }
+    var query = db.model(table).find({teamID:teamID}).select({
+        val: 1,
+        sensID: 1,
+        date: 1,
+        _id: 0
     });
-});
-
-app.get('/humidity/:teamID/:N', function(req, res){
-    var teamID = req.params.teamID;
-    var N = req.params.N;
-    var query = mongoose.model('humidity').find({teamID:teamID});
     if(N != 'all'){
         query = query.limit(parseInt(N));
     }
     query.exec(function(err, data){
         if(err) {
-            res.json({
-                statusCode: status["02"].code,
-                statusDesc: status["02"].desc
-            });
-        } else if(data.length == 0){
-            res.json({
-                statusCode: status["01"].code,
-                statusDesc: status["01"].desc
-            });
-        } else {
-            res.json({
-                statusCode: status["00"].code,
-                statusDesc: status["00"].desc,
-                data: data
-            });
-        }
-    });
-});
-
-app.get('/gyroscope/:teamID/:N', function(req, res){
-    var teamID = req.params.teamID;
-    var N = req.params.N;
-    var query = mongoose.model('gyroscope').find({teamID:teamID});
-    if(N != 'all'){
-        query = query.limit(parseInt(N));
-    }
-    query.exec(function(err, data){
-        if(err) {
-            res.json({
-                statusCode: status["02"].code,
-                statusDesc: status["02"].desc
-            });
-        } else if(data.length == 0){
-            res.json({
-                statusCode: status["01"].code,
-                statusDesc: status["01"].desc
-            });
-        } else {
-            res.json({
-                statusCode: status["00"].code,
-                statusDesc: status["00"].desc,
-                data: data
-            });
-        }
-    });
-});
-
-app.get('/accelerometer/:teamID/:N', function(req, res){
-    var teamID = req.params.teamID;
-    var N = req.params.N;
-    var query = mongoose.model('accelerometer').find({teamID:teamID});
-    if(N != 'all'){
-        query = query.limit(parseInt(N));
-    }
-    query.exec(function(err, data){
-        if(err) {
-            res.json({
-                statusCode: status["02"].code,
-                statusDesc: status["02"].desc
-            });
-        } else if(data.length == 0){
-            res.json({
-                statusCode: status["01"].code,
-                statusDesc: status["01"].desc
-            });
-        } else {
-            res.json({
-                statusCode: status["00"].code,
-                statusDesc: status["00"].desc,
-                data: data
-            });
-        }
-    });
-});
-
-app.get('/magnetometer/:teamID/:N', function(req, res){
-    var teamID = req.params.teamID;
-    var N = req.params.N;
-    var query = mongoose.model('magnetometer').find({teamID:teamID});
-    if(N != 'all'){
-        query = query.limit(parseInt(N));
-    }
-    query.exec(function(err, data){
-        if(err) {
-            res.json({
-                statusCode: status["02"].code,
-                statusDesc: status["02"].desc
-            });
-        } else if(data.length == 0){
-            res.json({
-                statusCode: status["01"].code,
-                statusDesc: status["01"].desc
-            });
-        } else {
-            res.json({
-                statusCode: status["00"].code,
-                statusDesc: status["00"].desc,
-                data: data
-            });
-        }
-    });
-});
-
-app.get('/leds/:teamID/:N', function(req, res){
-    var teamID = req.params.teamID;
-    var N = req.params.N;
-    var query = mongoose.model('leds').find({teamID:teamID});
-    if(N != 'all'){
-        query = query.limit(parseInt(N));
-    }
-    query.exec(function(err, data){
-        if(err) {
-            res.json({
-                statusCode: status["02"].code,
-                statusDesc: status["02"].desc
-            });
-        } else if(data.length == 0){
-            res.json({
-                statusCode: status["01"].code,
-                statusDesc: status["01"].desc
-            });
-        } else {
-            res.json({
-                statusCode: status["00"].code,
-                statusDesc: status["00"].desc,
-                data: data
-            });
-        }
-    });
-});
-
-app.get('/din:M/:teamID/:N', function(req, res){
-    var teamID = req.params.teamID;
-    var M = req.params.M;
-    if( [1,2,3,4,5].indexOf(parseInt(M)) <= -1 ){
-        res.json({
-            statusCode: status["02"].code,
-            statusDesc: status["02"].desc
-        });
-        return null;
-    }
-    var N = req.params.N;
-    var query = mongoose.model('din').find({teamID:teamID, M:M});
-    if(N != 'all'){
-        query = query.limit(parseInt(N));
-    }
-    query.exec(function(err, data){
-        if(err) {
-            res.json({
-                statusCode: status["02"].code,
-                statusDesc: status["02"].desc
-            });
+            res.send(err);
         } else if(data.length == 0){
             res.json({
                 statusCode: status["01"].code,
@@ -275,28 +94,33 @@ app.get('/din:M/:teamID/:N', function(req, res){
 });
 
 /*
-app.get('/insert', function(req, res) {
-    var Pressure = mongoose.model('pressure');
-    var nn = new Pressure({
-        teamID:1,
-        sensID:1,
-        val:60
-    });
-    nn.save(function(err, result) {
-        if (err) res.send(err);
-        res.json(result)
-    });
-    //res.render('pages/index');
-    //res.send('ok');
+apiRoutes.post('/insert/:table', function(req, res){
+    var pass = req.query.pass;
+    if(pass != 'TESA2018byKMUTNB'){
+        res.send('Error');
+    } else {
+        var table = req.params.table;
+        var schema = db.model(table);
+        var data = new schema(req.body);
+        data.save(function(err, result){
+            if (err) res.send(err);
+            else res.send('success');
+        });
+    }
 });
 */
 
+app.use('/api', apiRoutes);
+app.use('/mockup', mockupRoutes);
+
+/*
 app.get('*', function(req, res){
     res.json({
         statusCode: status["02"].code,
         statusDesc: status["02"].desc
     });
 });
+*/
 
 
 app.listen(app.get('port'), function() {

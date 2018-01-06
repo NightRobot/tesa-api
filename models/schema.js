@@ -138,9 +138,6 @@ var din = new Schema({
     sensID: {
         type: String
     },
-    M: {
-        type: Number
-    },
     val: {
         type: String
     },
@@ -150,6 +147,7 @@ var din = new Schema({
     }
 });
 
+
 module.exports = mongoose.model('pressure', pressure);
 module.exports = mongoose.model('temperature', temperature);
 module.exports = mongoose.model('humidity', humidity);
@@ -157,4 +155,8 @@ module.exports = mongoose.model('gyroscope', gyroscope);
 module.exports = mongoose.model('accelerometer', accelerometer);
 module.exports = mongoose.model('magnetometer', magnetometer);
 module.exports = mongoose.model('leds', leds);
-module.exports = mongoose.model('din', din);
+module.exports = mongoose.model('din1', din);
+module.exports = mongoose.model('din2', din);
+module.exports = mongoose.model('din3', din);
+module.exports = mongoose.model('din4', din);
+module.exports = mongoose.model('din5', din);
